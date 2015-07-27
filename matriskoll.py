@@ -10,6 +10,19 @@ def kollaMatris(matris):
     resultat = kollaVer(matris)
     if resultat == True:
         return True
+    resultat = kollaDiagonalHoger(matris)
+    if resultat == True:
+        return True
+    resultat = kollaDiagonalVanster(matris)
+    if resultat == True:
+        return True
+    return False
+
+def kollaHor(matris):
+    for rad in matris:
+        resultat = kollaRad(rad)
+        if resultat == True:
+            return True
     return False
 
 def kollaRad(vektor):
@@ -24,15 +37,7 @@ def kollaRad(vektor):
             counter += 1
         else:
             counter = 1
-        print counter
         if counter == antal_i_rad:
-            return True
-    return False
-
-def kollaHor(matris):
-    for rad in matris:
-        resultat = kollaRad(rad)
-        if resultat == True:
             return True
     return False
 
@@ -41,7 +46,16 @@ def kollaVer(matris):
     resultat = kollaHor(vertMatris)
     return resultat
 
-def kollaDiagonal(matris):
+def raderTillKolumner(matris):
+    flippadMatris = copy.deepcopy(matris)
+    rader = len(matris)
+    kolumner = len(matris)
+    for i in range(rader):
+        for j in range(kolumner):
+            flippadMatris[j][i] = matris[i][j]
+    return flippadMatris
+
+def kollaDiagonalHoger(matris):
     """Kollar både höger och vänster diagonal"""
     antal_i_rad = 5
     rader = len(matris)
@@ -53,15 +67,12 @@ def kollaDiagonal(matris):
     diagonalRader.remove(0)
     for i in diagonalRader:
         diagonal = hamtaDiagonal(matris, rad = i)
-        print(diagonal)
         resultat = kollaRad(diagonal)
         if resultat == True:
             return True
     # Kolla alla diagonaler som startar i rad 0
     for i in range(maxKolumner):
-        print "i=" + str(i)
         diagonal = hamtaDiagonal(matris, kolumn = i)
-        print(diagonal)
         resultat = kollaRad(diagonal)
         if resultat == True:
             return True
@@ -79,20 +90,15 @@ def hamtaDiagonal(matris, rad = 0, kolumn = 0):
         kolumn += 1
     return vektor
 
-def raderTillKolumner(matris):
-    flippadMatris = copy.deepcopy(matris)
-    rader = len(matris)
-    kolumner = len(matris)
-    for i in range(rader):
-        for j in range(kolumner):
-            flippadMatris[j][i] = matris[i][j]
-    return flippadMatris
-
+def kollaDiagonalVanster(matris):
+    speglad = horisontellSpeglingMatris(matris)
+    resultat = kollaDiagonalHoger(speglad)
+    return resultat
+    
 def horisontellSpeglingMatris(matris):
     speglad_temp = zip(*matris[::-1])
     speglad = copy.deepcopy(speglad_temp)
     return speglad
-    
 
 def koraTest(test):
     """ Skriver ut snygga tester"""
@@ -115,6 +121,14 @@ def main():
                ['x', 'c', 'f', 4, 'h', 3, '0', '0', 3],
                ['x', 'c', 'f', 4, 'h', 3, 1, 5, '0']]
 
+    verTrue2 = [['x', 'x', '0', 4, 'h', 3, 0, 5, 3],
+               ['x', 'c', 'f', 'r', 'h', 0, 1, 5, 3],
+               ['r', '4', 'f', 4, 0, 3, 1, 5, 3],
+               ['x', 'x', 'x', 0, '0', '0', 1, 5, 3],
+               ['x', 'c', 0, 4, 'h', 3, 'o', '0', 3],
+               ['x', 0, 'f', 4, 'h', 3, 1, 5, '0']]
+
+    
     falseMatrix = [['x', 'x', '0', 4, 'h'],
                     ['x', 'c', 'f', 't', 'h'],
                     ['x', '4', 'f', 4, 'h'],
@@ -122,6 +136,7 @@ def main():
                     ['x', 'c', 'f', 4, 'h']]
 
 
-    res = kollaDiagonal(verTrue)
+    res = kollaMatris(verTrue2)
+    skrivaMatris(verTrue2)
     print res
 main()
