@@ -51,14 +51,13 @@ def kollaDia(matris):
         return True
     return False
 
-def kollaHoger(matris):
+def kollaHoger(matris, rad = 0, kolumn = 0):
     antal_i_rad = 5
     rader = len(matris)
     kolumner = len(matris[0])
     maxRader = rader - (antal_i_rad - 1)
     maxKolumner = kolumner - (antal_i_rad - 1)
     vektor = []
-    rad = kolumn = 0
     while rad<=(rader-1) and kolumn<=(kolumner-1):
         element = matris[rad][kolumn]
         vektor.append(element)
@@ -110,6 +109,6 @@ def main():
                     ['x', 'c', 'f', 4, 'h']]
 
 
-    res = kollaHoger(verTrue)
+    res = kollaHoger(verTrue, rad = 4)
     print res
 main()
