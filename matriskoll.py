@@ -41,6 +41,38 @@ def kollaVer(matris):
     resultat = kollaHor(vertMatris)
     return resultat
 
+def kollaDia(matris):
+    """Kollar både höger och vänster diagonal"""
+    resultat = kollaHoger(matris)
+    if resultat == True:
+        return True
+    resultat = kollaVanster(matris)
+    if resultat == True:
+        return True
+    return False
+
+def kollaHoger(matris):
+    antal_i_rad = 5
+    rader = len(matris)
+    kolumner = len(matris[0])
+    maxRader = rader - (antal_i_rad - 1)
+    maxKolumner = kolumner - (antal_i_rad - 1)
+    vektor = []
+    rad = kolumn = 0
+    while rad<=(rader-1) and kolumn<=(kolumner-1):
+        element = matris[rad][kolumn]
+        vektor.append(element)
+        rad += 1
+        kolumn += 1
+    return vektor
+        
+def hamtaDiagonal(matris, radStart, kolumnStart):
+    vektor = []
+    rader = len(matris)
+    kolumner = len(matris[0])
+    maxRader = rader - (antal_i_rad - 1)
+    maxKolumner = kolumner - (antal_i_rad - 1)
+
 def flippaMatris(matris):
     flippadMatris = copy.deepcopy(matris)
     rader = len(matris)
@@ -78,6 +110,6 @@ def main():
                     ['x', 'c', 'f', 4, 'h']]
 
 
-    res = kollaMatris(verTrue)
+    res = kollaHoger(verTrue)
     print res
 main()
