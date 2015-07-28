@@ -17,7 +17,7 @@ class Kryssruta(Button):
         self.kryssad = False
         self["command"] = self.kryssa
         #self["text"] = str(self.rad)+","+str(kolumn)
-
+        
     def kryssa(self):
         if not self.kryssad:
             self["text"] = "X"
@@ -26,7 +26,8 @@ class Kryssruta(Button):
             self["text"] = "O"
         elif self["text"] == "O":
             self["text"] = "X"
-
+        self.master.matrisKontroll()
+        
 class KnappMatris(Frame):
     """En lista med kryssrutor som ritas som en matris"""
     def __init__(self, master = None, rader = 5, kolumner = 5):
@@ -39,7 +40,7 @@ class KnappMatris(Frame):
         self.inforad = Label(master, text = "Information kan skrivas här")
         self.pynta(self.inforad, bredd = (self.kolumner+2)*3)
         self.inforad.grid(row = self.rader, column = 0)
-
+        
     def pynta(self, komponent, bredd = 3, hojd = 1, bakgrundsfarg = "white", textfarg = "black", font = ("Ubuntu Mono", 20, "normal")):
         komponent["width"] = bredd
         komponent["height"] = hojd
@@ -63,7 +64,7 @@ class KnappMatris(Frame):
         index = 0
         for knapp in self.knapplista:
             if knapp.kryssad:
-                v[index] = "X"
+                v[index] = knapp["text"]
             index += 1
         return v
 
@@ -81,11 +82,11 @@ class KnappMatris(Frame):
     def matrisKontroll(self):
         matris = self.kryssmatris()
         resultat = matriskoll.kollaMatris(matris)
+        matriskoll.skrivaMatris(matris)
         if resultat == True:
             print "Vi har en vinnare!"
         else:
             print "Ingen har vunnit än..."
-    
     
 def main():
     rot = Tk()
