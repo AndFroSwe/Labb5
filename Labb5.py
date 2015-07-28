@@ -27,6 +27,7 @@ class Kryssruta(Button):
         elif self["text"] == "O":
             self["text"] = "X"
         self.master.matrisKontroll()
+        self.master.bytInforad()
         
 class KnappMatris(Frame):
     """En lista med kryssrutor som ritas som en matris"""
@@ -37,10 +38,22 @@ class KnappMatris(Frame):
         self.kolumner = kolumner
         self.antal = rader*kolumner
         self.skapaKryssrutor()
-        self.inforad = Label(master, text = "Information kan skrivas här")
+        self.info = self.setInfo()
+        self.inforad = Label(master, textvariable = self.info)
         self.pynta(self.inforad, bredd = (self.kolumner+2)*3)
         self.inforad.grid(row = self.rader, column = 0)
-        
+
+    def setInfo(self):
+        info = StringVar()
+        info.set("X tur")
+        return info
+
+    def bytInforad(self):
+        if self.info.get() == "X tur":
+            self.info.set("O:s tur")
+        else:
+            self.info.set("X tur")
+    
     def pynta(self, komponent, bredd = 3, hojd = 1, bakgrundsfarg = "white", textfarg = "black", font = ("Ubuntu Mono", 20, "normal")):
         komponent["width"] = bredd
         komponent["height"] = hojd
@@ -59,7 +72,7 @@ class KnappMatris(Frame):
             self.knapplista.append(ny)
 
     def kryssvektor(self):
-        """ Returnerar en lista med spelbanan """
+        """ Returnerar en lista med pspelbanan """
         v = [" "]*self.antal
         index = 0
         for knapp in self.knapplista:
@@ -87,7 +100,7 @@ class KnappMatris(Frame):
             print "Vi har en vinnare!"
         else:
             print "Ingen har vunnit än..."
-    
+        
 def main():
     rot = Tk()
     matris = KnappMatris(rot, rader = 10, kolumner = 10)
