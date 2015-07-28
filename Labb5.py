@@ -17,17 +17,25 @@ class Kryssruta(Button):
         self.kryssad = False
         self["command"] = self.kryssa
         #self["text"] = str(self.rad)+","+str(kolumn)
-        
+
     def kryssa(self):
+        nastaSpelare = self.master.hamtaNastaSpelare()
         if not self.kryssad:
-            self["text"] = "X"
-            self.kryssad = True
-        elif self["text"] == "X":
-            self["text"] = "O"
-        elif self["text"] == "O":
-            self["text"] = "X"
+            if nastaSpelare == "X":
+                self["text"] = "X"
+                self.master.okaOmgang()
+                self.master.bytInforad("O tur")
+                self.kryssad = True
+            elif nastaSpelare == "O":
+                self["text"] = "O"
+                self.master.okaOmgang()
+                self.master.bytInforad("X tur")
+                self.kryssad = True
+            else:
+                self["text"] = "ERROR"
+        else:
+            print "Ruta upptagen"
         self.master.matrisKontroll()
-        self.master.bytInforad()
         
 class KnappMatris(Frame):
     """En lista med kryssrutor som ritas som en matris"""
@@ -42,18 +50,31 @@ class KnappMatris(Frame):
         self.inforad = Label(master, textvariable = self.info)
         self.pynta(self.inforad, bredd = (self.kolumner+2)*3)
         self.inforad.grid(row = self.rader, column = 0)
+        self.omgang = 0
 
     def setInfo(self):
         info = StringVar()
         info.set("X tur")
         return info
 
-    def bytInforad(self):
-        if self.info.get() == "X tur":
-            self.info.set("O:s tur")
-        else:
-            self.info.set("X tur")
-    
+    def bytInforad(self, text):
+        self.info.set(text)
+            
+    def okaOmgang(self):
+        self.omgang += 1
+
+    def hamtaSpelare(self):
+        if self.omgang%2 == 0:
+            return "O"
+        else: 
+            return "X"
+        
+    def hamtaNastaSpelare(self):
+        if self.omgang%2 == 0:
+            return "X"
+        else: 
+            return "O"
+      
     def pynta(self, komponent, bredd = 3, hojd = 1, bakgrundsfarg = "white", textfarg = "black", font = ("Ubuntu Mono", 20, "normal")):
         komponent["width"] = bredd
         komponent["height"] = hojd
@@ -97,7 +118,9 @@ class KnappMatris(Frame):
         resultat = matriskoll.kollaMatris(matris)
         matriskoll.skrivaMatris(matris)
         if resultat == True:
-            print "Vi har en vinnare!"
+            spelare = self.hamtaSpelare()
+            vinnarString = spelare + " vinner!"
+            self.bytInforad(vinnarString)
         else:
             print "Ingen har vunnit än..."
         
