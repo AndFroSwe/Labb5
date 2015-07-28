@@ -4,6 +4,7 @@
 
 from Tkinter import *
 import matriskoll
+import time
 
 class Kryssruta(Button):
     """ Knapp som kryssas i/ur när man trycker på den """
@@ -36,11 +37,16 @@ class Kryssruta(Button):
         else:
             print "Ruta upptagen"
         self.master.matrisKontroll()
+
+    def taBortCommand(self):
+        self.configure(command = lambda: None)
+        
         
 class KnappMatris(Frame):
     """En lista med kryssrutor som ritas som en matris"""
     def __init__(self, master = None, rader = 5, kolumner = 5):
         Frame.__init__(self, master)
+        self.master = master
         self.grid()
         self.rader = rader
         self.kolumner = kolumner
@@ -93,7 +99,7 @@ class KnappMatris(Frame):
             self.knapplista.append(ny)
 
     def kryssvektor(self):
-        """ Returnerar en lista med pspelbanan """
+        """ Returnerar en lista med spelbanan """
         v = [" "]*self.antal
         index = 0
         for knapp in self.knapplista:
@@ -109,25 +115,27 @@ class KnappMatris(Frame):
         for i in range(self.rader):
             rad_temp = []
             for j in range(self.kolumner):
-                rad_temp.append(vektor[(i-1)*(self.kolumner)+j])
+                rad_temp.append(vektor[(i)*(self.kolumner)+j])
             matris.append(rad_temp)
         return matris
 
     def matrisKontroll(self):
         matris = self.kryssmatris()
         resultat = matriskoll.kollaMatris(matris)
-        matriskoll.skrivaMatris(matris)
+        #matriskoll.skrivaMatris(matris)
         if resultat == True:
             spelare = self.hamtaSpelare()
             vinnarString = spelare + " vinner!"
             self.bytInforad(vinnarString)
-        else:
-            print "Ingen har vunnit än..."
+            self.stoppaSpel()
+
+    def stoppaSpel(self):
+        for knapp in self.knapplista:
+            knapp.taBortCommand()
         
 def main():
     rot = Tk()
     matris = KnappMatris(rot, rader = 10, kolumner = 10)
-    matris.matrisKontroll()
     matris.mainloop()
 
 main()
