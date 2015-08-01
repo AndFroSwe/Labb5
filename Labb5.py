@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-    # Behövs i python 2 för åäö
 # Labb 5 i tilpro
 # Rita upp ett gränssnitt
@@ -134,8 +135,10 @@ class KnappMatris(Frame):
             knapp.taBortCommand()
         
 def main():
+    antal_rader = input("Hur många rader vill du ha? ")
+    antal_kolumner = input("Hur många kolumner vill du ha? ")
     rot = Tk()
-    matris = KnappMatris(rot, rader = 10, kolumner = 10)
+    matris = KnappMatris(rot, rader = antal_rader, kolumner = antal_kolumner)
     matris.mainloop()
 
 main()
