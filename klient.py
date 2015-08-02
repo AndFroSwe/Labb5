@@ -1,22 +1,27 @@
-#!/usr/bin/python           # This is client.py file
-# modified http://www.tutorialspoint.com/python/python_networking.htm
+#!/usr/bin/python           
+import socket, pickle
+from Tkinter import *
+import Kryssruta    # Spelplanen
 
-import socket               # Import socket module
-import pickle
 
-s = socket.socket()         # Create a socket object
-host = socket.gethostname() # Get local machine name
-port = 12345                # Reserve a port for your service.
-s.connect((host, port))
+def connectToServer(port):
+    s = socket.socket()        
+    host = socket.gethostname()       
+    s.connect((host, port))
+    return s
 
-while True:
-    x = s.recv(1024)            #! Spara mottaget data i x
-    if x:
-            print "Mottagit meddelande"
-            lista = pickle.loads(x)     #! packa upp med pickle
+def main():
+    port = 12345
+    s = connectToServer(port)
+    
+    while True:
+        x = s.recv(1024)            #! Spara mottaget data i x
+        if x:
+            lista = pickle.loads(x)
             print lista
             if lista == "exit":
                 break
             x = None
+        s.close
 
-s.close                     # Close the socket when done
+main()

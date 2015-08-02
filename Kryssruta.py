@@ -17,20 +17,20 @@ class Kryssruta(Button):
         self.kolumn = kolumn
         self.kryssad = False
         self["command"] = self.kryssa
-        #self["text"] = str(self.rad)+","+str(kolumn)
+        self.text = self.setText("hej")
 
     def kryssa(self):
         nastaSpelare = self.master.hamtaNastaSpelare()
         if not self.kryssad:
             if nastaSpelare == "X":
-                self["text"] = "X"
+                self.bytText("X")
                 self.master.okaOmgang()
-                self.master.bytInfo("O tur")
+                self.master.setInfo("O tur")
                 self.kryssad = True
             elif nastaSpelare == "O":
-                self["text"] = "O"
+                self.bytText("O")
                 self.master.okaOmgang()
-                self.master.bytInfo("X tur")
+                self.master.setInfo("X tur")
                 self.kryssad = True
             else:
                 self["text"] = "ERROR"
@@ -40,6 +40,14 @@ class Kryssruta(Button):
 
     def taBortCommand(self):
         self.configure(command = lambda: None)
+
+    def setText(self, text):
+        info = StringVar()
+        info.set(text)
+        return info
+
+    def bytText(self, text):
+        self.text.set(text)
         
         
 class KnappMatris(Frame):
@@ -62,10 +70,7 @@ class KnappMatris(Frame):
         info = StringVar()
         info.set(text)
         return info
-
-    def bytInfo(self, text):
-        self.info.set(text)
-        
+            
     def okaOmgang(self):
         self.omgang += 1
 
@@ -108,7 +113,7 @@ class KnappMatris(Frame):
             index += 1
         return v
 
-    def kryssmatris(self):
+    def hamtaKryssmatris(self):
         """ Returnerar en matris med spelbanan """
         vektor = self.kryssvektor()
         matris = []
@@ -119,10 +124,13 @@ class KnappMatris(Frame):
             matris.append(rad_temp)
         return matris
 
+    def setKryssmatris(self, vektor):
+        for index, knapp in enumerate(vektor):
+            self.knapplista[index] = text
+
     def matrisKontroll(self):
-        matris = self.kryssmatris()
+        matris = self.hamtaKryssmatris()
         resultat = matriskoll.kollaMatris(matris)
-        #matriskoll.skrivaMatris(matris)
         if resultat == True:
             spelare = self.hamtaSpelare()
             vinnarString = spelare + " vinner!"
@@ -134,11 +142,11 @@ class KnappMatris(Frame):
             knapp.taBortCommand()
         
 def main():
-    antal_rader = input("Hur mÃ¥nga rader vill du ha? ")
-    antal_kolumner = input("Hur mÃ¥nga kolumner vill du ha? ")
-    rot = Tk()
-    matris = KnappMatris(rot, rader = antal_rader, kolumner = antal_kolumner)
-    matris.mainloop()
+   antal_rader = input("Hur många rader vill du ha? ")
+   antal_kolumner = input("Hur många kolumner vill du ha? ")
+   rot = Tk()
+   matris = KnappMatris(rot, rader = antal_rader, kolumner = antal_kolumner)
+   matris.mainloop()
 
 main()
     
