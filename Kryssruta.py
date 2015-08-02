@@ -97,7 +97,7 @@ class KnappMatris(Frame):
             ny.grid(row = ny.rad, column = ny.kolumn)
             self.knapplista.append(ny)
 
-    def kryssvektor(self):
+    def hamtaKryssvektor(self):
         """ Returnerar en lista med spelbanan """
         v = [" "]*self.antal
         index = 0
@@ -109,7 +109,7 @@ class KnappMatris(Frame):
 
     def kryssmatris(self):
         """ Returnerar en matris med spelbanan """
-        vektor = self.kryssvektor()
+        vektor = self.hamtaKryssvektor()
         matris = []
         for i in range(self.rader):
             rad_temp = []
@@ -131,7 +131,12 @@ class KnappMatris(Frame):
     def stoppaSpel(self):
         for knapp in self.knapplista:
             knapp.taBortCommand()
+
+    def setKryssmatris(self, vektor):
+        for index, knapp in enumerate(self.knapplista):
+            knapp["text"] = vektor[index]
         
+            
 def main():
     antal_rader = input("Hur mÃ¥nga rader vill du ha? ")
     antal_kolumner = input("Hur mÃ¥nga kolumner vill du ha? ")
@@ -140,7 +145,3 @@ def main():
     matris.mainloop()
 
 main()
-    
-
-        
-    
