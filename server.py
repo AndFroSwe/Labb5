@@ -38,7 +38,8 @@ class Kryssruta(Button):
         else:
             print "Ruta upptagen"
         self.master.matrisKontroll()
-
+        self.master.skickaSpelplan()
+        
     def taBortCommand(self):
         self.configure(command = lambda: None)
                 
@@ -57,7 +58,7 @@ class KnappMatris(Frame):
         self.pynta(self.inforad, bredd = (self.kolumner+2)*3)
         self.inforad.grid(row = self.rader, column = 0)
         self.omgang = 0
-#        self.connectToKlient()
+        self.connectToClient()
 
     def setInfo(self, text):
         info = StringVar()
@@ -140,63 +141,29 @@ class KnappMatris(Frame):
 
     def skickaSpelplan(self):
        spelplan = self.kryssmatris()
-       paket = pickle.dumps()
-        
-'''            
-    def connectToKlient(self):
-        self.s = socket.socket()        
+       paket = pickle.dumps(spelplan)
+       self.c.send(paket)
+
+    def connectToClient(self):
+        self.s = socket.socket()
         host = socket.gethostname()
-        port = 12345               
-        self.s.bind((host, port))       
-        self.s.listen(5)
+        port = 12345
+        self.s.bind((host, port))        # Bind to the port
+        self.s.listen(5)                 # Now wait for client connection.
         self.c, mess = self.s.accept()     # Establish connection with client.
-        print mess
-'''
-'''
-def intemain():
-   c = connectToKlient()
-   rot = Tk()
-   mainloop()
-   while True:
-      message = raw_input('-->')
-      gurka = pickle.dumps(message)
-      c.send(gurka)
-      if message == "exit":
-         break   
-   c.close()
-'''
 
-def connectToClient():
-    s = socket.socket()
-    host = socket.gethostname()
-    port = 12345
-    s.bind((host, port))        # Bind to the port
-    s.listen(5)                 # Now wait for client connection.
-    c, mess = s.accept()     # Establish connection with client.
-    print mess
-
-    while True:
-        message = raw_input('-->')
-        gurka = pickle.dumps(message)
-        c.send(gurka)
-        if message == "exit":
-            break   
-    c.close()
-
+ 
 def startaSpel():
     antal_rader = 10
     antal_kolumner =10
     rot = Tk()
     matris = KnappMatris(rot, rader = antal_rader, kolumner = antal_kolumner)
     matris.mainloop()
-    
 
     
 def main():
-    t1 = threading.Thread(target=connectToClient)
-    t2 = threading.Thread(target=startaSpel)
-    t1.start(); t2.start()
-    
+    matris = startaSpel()
+        
 main()
 
 
