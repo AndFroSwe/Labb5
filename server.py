@@ -4,7 +4,7 @@
 
 #!/usr/bin/python          
 
-import socket, pickle, matriskoll
+import socket, pickle, matriskoll, threading
 from Tkinter import *
 
 class Kryssruta(Button):
@@ -166,8 +166,7 @@ def intemain():
    c.close()
 '''
 
-
-def main():
+def connectToClient():
     s = socket.socket()
     host = socket.gethostname()
     port = 12345
@@ -184,12 +183,20 @@ def main():
             break   
     c.close()
 
+def startaSpel():
     antal_rader = 10
     antal_kolumner =10
     rot = Tk()
     matris = KnappMatris(rot, rader = antal_rader, kolumner = antal_kolumner)
     matris.mainloop()
+    
 
+    
+def main():
+    t1 = threading.Thread(target=connectToClient)
+    t2 = threading.Thread(target=startaSpel)
+    t1.start(); t2.start()
+    
 main()
 
 
