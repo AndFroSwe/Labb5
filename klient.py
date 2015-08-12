@@ -1,8 +1,6 @@
 #!/usr/bin/python           
 import socket, pickle
 from Tkinter import *
-import Kryssruta    # Spelplanen
-
 
 def connectToServer(port):
     s = socket.socket()        

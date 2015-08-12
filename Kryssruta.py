@@ -9,7 +9,7 @@ import time
 class Kryssruta(Button):
     """ Knapp som kryssas i/ur nÃ¤r man trycker pÃ¥ den """
 
-    def __init__(self, master = None, nr = 0, rad = 0, kolumn = 0):
+    def __init__(self, master = None, nr = 0, rad = 7, kolumn = 7):
         Button.__init__(self, master)
         self.master = master
         self.nr = nr
@@ -145,3 +145,4 @@ def main():
     matris.mainloop()
 
 main()
+

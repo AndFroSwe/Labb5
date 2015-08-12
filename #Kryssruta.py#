@@ -9,7 +9,7 @@ import time
 class Kryssruta(Button):
     """ Knapp som kryssas i/ur nÃ¤r man trycker pÃ¥ den """
 
-    def __init__(self, master = None, nr = 0, rad = 0, kolumn = 0):
+    def __init__(self, master = None, nr = 0, rad = 7, kolumn = 7):
         Button.__init__(self, master)
         self.master = master
         self.nr = nr
@@ -17,7 +17,7 @@ class Kryssruta(Button):
         self.kolumn = kolumn
         self.kryssad = False
         self["command"] = self.kryssa
-        #self["text"] = str(self.rad)+","+str(kolumn)
+        self["text"] = " " 
 
     def kryssa(self):
         nastaSpelare = self.master.hamtaNastaSpelare()
@@ -40,8 +40,7 @@ class Kryssruta(Button):
 
     def taBortCommand(self):
         self.configure(command = lambda: None)
-        
-        
+                
 class KnappMatris(Frame):
     """En lista med kryssrutor som ritas som en matris"""
     def __init__(self, master = None, rader = 5, kolumner = 5):
@@ -98,7 +97,7 @@ class KnappMatris(Frame):
             ny.grid(row = ny.rad, column = ny.kolumn)
             self.knapplista.append(ny)
 
-    def kryssvektor(self):
+    def hamtaKryssvektor(self):
         """ Returnerar en lista med spelbanan """
         v = [" "]*self.antal
         index = 0
@@ -110,7 +109,7 @@ class KnappMatris(Frame):
 
     def kryssmatris(self):
         """ Returnerar en matris med spelbanan """
-        vektor = self.kryssvektor()
+        vektor = self.hamtaKryssvektor()
         matris = []
         for i in range(self.rader):
             rad_temp = []
@@ -126,13 +125,18 @@ class KnappMatris(Frame):
         if resultat == True:
             spelare = self.hamtaSpelare()
             vinnarString = spelare + " vinner!"
-            self.setInfo(vinnarString)
+            self.bytInfo(vinnarString)
             self.stoppaSpel()
 
     def stoppaSpel(self):
         for knapp in self.knapplista:
             knapp.taBortCommand()
 
+    def setKryssmatris(self, vektor):
+        for index, knapp in enumerate(self.knapplista):
+            knapp["text"] = vektor[index]
+        
+'''            
 def main():
     antal_rader = input("Hur mÃ¥nga rader vill du ha? ")
     antal_kolumner = input("Hur mÃ¥nga kolumner vill du ha? ")
@@ -140,9 +144,5 @@ def main():
     matris = KnappMatris(rot, rader = antal_rader, kolumner = antal_kolumner)
     matris.mainloop()
 
-    
 main()
-    
-
-        
-    
+'''
