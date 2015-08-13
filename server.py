@@ -59,6 +59,11 @@ class KnappMatris(Frame):
         self.inforad.grid(row = self.rader, column = 0)
         self.omgang = 0
         self.connectToClient()
+        self.startaTaEmot()
+        
+    def startaTaEmot(self):
+        self.t = threading.Thread(target = self.taEmotSpelplan)
+        self.t.start()
 
     def setInfo(self, text):
         info = StringVar()
@@ -124,7 +129,6 @@ class KnappMatris(Frame):
     def matrisKontroll(self):
         matris = self.kryssmatris()
         resultat = matriskoll.kollaMatris(matris)
-        #matriskoll.skrivaMatris(matris)
         if resultat == True:
             spelare = self.hamtaSpelare()
             vinnarString = spelare + " vinner!"
@@ -134,6 +138,25 @@ class KnappMatris(Frame):
     def stoppaSpel(self):
         for knapp in self.knapplista:
             knapp.taBortCommand()
+
+    def skickaSpelplan(self):
+       spelplan = self.kryssmatris()
+       paket = pickle.dumps(spelplan)
+       self.c.send(paket)
+            
+    def taEmotSpelplan(self):
+        print "Tar emot..."
+        while True:
+            mottaget = self.c.recv(1024)
+            plan = pickle.loads(mottaget)
+            print plan
+            self.setSpelplan(plan)
+            mottaget = plan = None # Återställa variabler
+         
+    def setSpelplan(self, plan):
+        for index, tecken in enumerate (plan):
+            if self.knapplista[index] != " ":
+                self.knapplista[index]["text"] = tecken
 
     def setKryssmatris(self, vektor):
         for index, knapp in enumerate(self.knapplista):

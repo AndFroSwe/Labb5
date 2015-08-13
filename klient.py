@@ -4,7 +4,7 @@
 
 #!/usr/bin/python          
 
-import socket, pickle, matriskoll, threading, thread
+import socket, pickle, matriskoll, threading
 from Tkinter import *
 
 class Kryssruta(Button):
@@ -38,6 +38,7 @@ class Kryssruta(Button):
         else:
             print "Ruta upptagen"
         self.master.matrisKontroll()
+        self.master.skickaSpelplan()
         
     def taBortCommand(self):
         self.configure(command = lambda: None)
@@ -141,14 +142,11 @@ class KnappMatris(Frame):
         for knapp in self.knapplista:
             knapp.taBortCommand()
 
-    def setKryssmatris(self, vektor):
-        for index, knapp in enumerate(self.knapplista):
-            knapp["text"] = vektor[index]
-
     def skickaSpelplan(self):
-       spelplan = self.kryssmatris()
-       paket = pickle.dumps(spelplan)
-       self.c.send(paket)
+        print "Skickar..."
+        spelplan = self.hamtaKryssvektor()
+        paket = pickle.dumps(spelplan)
+        self.s.send(paket)
 
     def taEmotSpelplan(self):
         print "Tar emot..."
@@ -161,7 +159,8 @@ class KnappMatris(Frame):
             
     def setSpelplan(self, plan):
         for index, tecken in enumerate (plan):
-            self.knapplista[index]["text"] = tecken
+            if self.knapplista[index] != " ":
+                self.knapplista[index]["text"] = tecken
             
     def connectToServer(self):
         self.s = socket.socket()
