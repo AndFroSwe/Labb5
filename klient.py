@@ -58,11 +58,11 @@ class KnappMatris(Frame):
         self.inforad.grid(row = self.rader, column = 0)
         self.omgang = 0
         self.connectToServer()
-        self.starta()
+        self.startaTaEmot()
         #self.t = threading.Thread(target = self.taEmotSpelplan)
         #self.taEmotSpelplan()
 
-    def starta(self):
+    def startaTaEmot(self):
         self.t = threading.Thread(target = self.taEmotSpelplan)
         self.t.start()
         
@@ -156,9 +156,13 @@ class KnappMatris(Frame):
             mottaget = self.s.recv(1024)
             plan = pickle.loads(mottaget)
             print plan
+            self.setSpelplan(plan)
             mottaget = plan = None # Återställa variabler
             
-
+    def setSpelplan(self, plan):
+        for index, tecken in enumerate (plan):
+            self.knapplista[index]["text"] = tecken
+            
     def connectToServer(self):
         self.s = socket.socket()
         host = socket.gethostname()

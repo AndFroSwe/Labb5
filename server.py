@@ -140,7 +140,7 @@ class KnappMatris(Frame):
             knapp["text"] = vektor[index]
 
     def skickaSpelplan(self):
-       spelplan = self.kryssmatris()
+       spelplan = self.hamtaKryssvektor()
        paket = pickle.dumps(spelplan)
        self.c.send(paket)
 
