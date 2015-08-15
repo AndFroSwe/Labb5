@@ -127,6 +127,7 @@ class KnappMatris(Frame):
         return matris
 
     def matrisKontroll(self):
+        print "Kollar matris..."
         matris = self.kryssmatris()
         resultat = matriskoll.kollaMatris(matris)
         if resultat == True:
@@ -145,7 +146,6 @@ class KnappMatris(Frame):
        self.c.send(paket)
             
     def taEmotSpelplan(self):
-        print "Tar emot..."
         while True:
             mottaget = self.c.recv(1024)
             plan = pickle.loads(mottaget)
@@ -155,9 +155,11 @@ class KnappMatris(Frame):
          
     def setSpelplan(self, plan):
         for index, tecken in enumerate (plan):
-            if self.knapplista[index] != " ":
+            if self.knapplista[index]["text"] == " ":
                 self.knapplista[index]["text"] = tecken
-
+                self.knapplista[index].kryssad == True
+        self.matrisKontroll()
+                
     def setKryssmatris(self, vektor):
         for index, knapp in enumerate(self.knapplista):
             knapp["text"] = vektor[index]

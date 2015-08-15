@@ -129,9 +129,9 @@ class KnappMatris(Frame):
         return matris
 
     def matrisKontroll(self):
+        print "Kollar om vinst"
         matris = self.kryssmatris()
         resultat = matriskoll.kollaMatris(matris)
-        #matriskoll.skrivaMatris(matris)
         if resultat == True:
             spelare = self.hamtaSpelare()
             vinnarString = spelare + " vinner!"
@@ -143,13 +143,11 @@ class KnappMatris(Frame):
             knapp.taBortCommand()
 
     def skickaSpelplan(self):
-        print "Skickar..."
         spelplan = self.hamtaKryssvektor()
         paket = pickle.dumps(spelplan)
         self.s.send(paket)
 
     def taEmotSpelplan(self):
-        print "Tar emot..."
         while True:
             mottaget = self.s.recv(1024)
             plan = pickle.loads(mottaget)
@@ -159,8 +157,10 @@ class KnappMatris(Frame):
             
     def setSpelplan(self, plan):
         for index, tecken in enumerate (plan):
-            if self.knapplista[index] != " ":
+            if self.knapplista[index]["text"] == " ":
                 self.knapplista[index]["text"] = tecken
+                self.knapplista[index].kryssad == True
+        self.matrisKontroll()
             
     def connectToServer(self):
         self.s = socket.socket()
