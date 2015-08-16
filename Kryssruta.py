@@ -4,7 +4,7 @@
 
 #!/usr/bin/python          
 
-import socket, pickle, matriskoll, threading
+import socket, pickle, matriskoll, threading, time
 from Tkinter import *
 
 class Kryssruta(Button):
@@ -28,13 +28,13 @@ class Kryssruta(Button):
                     self.setTecken("X")
                     self.master.okaOmgang()
                 elif self.master.spelare == "O":
-                    self.setTecken("O")
                     self.master.okaOmgang()
+                    self.setTecken("O")
                 else:
                     self["text"] = "ERROR, okänd spelare"
                     return
-                self.master.matrisKontroll()
                 self.master.skickaSpelplan()
+                self.master.matrisKontroll()
             else:
                 print "Ruta upptagen"
                 return
@@ -101,6 +101,12 @@ class KnappMatris(Frame):
             return "Din"
         else: 
             return "Motståndarens"
+    
+    def hamtaSlutSpelare(self):
+        if self.omgang%2 != 0:
+            return "Du"
+        else: 
+            return "Motståndaren"
         
     def hamtaNastaSpelare(self):
         if self.omgang%2 != 0:
@@ -133,7 +139,7 @@ class KnappMatris(Frame):
             if knapp.kryssad:
                 v[index] = knapp.hamtaTecken()
             index += 1
-        print "Kontrollerar: " + str(v)
+        #print "Kontrollerar: " + str(v)
         return v
 
     def kryssmatris(self):
@@ -152,7 +158,7 @@ class KnappMatris(Frame):
         matris = self.kryssmatris()
         resultat = matriskoll.kollaMatris(matris)
         if resultat == True:
-            spelare = self.hamtaSpelare()
+            spelare = self.hamtaSlutSpelare()
             vinnarString = spelare + " vinner!"
             self.bytInfo(vinnarString)
             self.stoppaSpel()
@@ -160,7 +166,7 @@ class KnappMatris(Frame):
     def stoppaSpel(self):
         for knapp in self.knapplista:
             knapp.taBortCommand()
-
+        
     def startaTaEmot(self):
         self.t = threading.Thread(target = self.taEmotSpelplan)
         self.t.start()
