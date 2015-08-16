@@ -27,12 +27,10 @@ class Kryssruta(Button):
                 self.setTecken("X")
                 self.master.okaOmgang()
                 self.master.bytInfo("O tur")
-                self.kryssad = True
             elif nastaSpelare == "O":
                 self.setTecken("O")
                 self.master.okaOmgang()
                 self.master.bytInfo("X tur")
-                self.kryssad = True
             else:
                 self["text"] = "ERROR"
         else:
@@ -42,6 +40,7 @@ class Kryssruta(Button):
 
     def setTecken(self, tecken):
         self.config(text = tecken)
+        self.kryssad = True
 
     def hamtaTecken(self):
         return self["text"]
@@ -156,7 +155,6 @@ class KnappMatris(Frame):
             
     def setSpelplan(self, plan):
         for index, tecken in enumerate (plan):
-            if not self.knapplista[index].kryssad == True: 
-                self.knapplista[index].kryssad == True
+            if not self.knapplista[index].kryssad == True and not tecken == " ": 
                 self.knapplista[index].setTecken(tecken)
         self.matrisKontroll()
