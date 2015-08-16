@@ -26,11 +26,9 @@ class Kryssruta(Button):
             if nastaSpelare == "X":
                 self.setTecken("X")
                 self.master.okaOmgang()
-                self.master.bytInfo("O tur")
             elif nastaSpelare == "O":
                 self.setTecken("O")
                 self.master.okaOmgang()
-                self.master.bytInfo("X tur")
             else:
                 self["text"] = "ERROR"
         else:
@@ -58,7 +56,7 @@ class KnappMatris(Frame):
         self.kolumner = kolumner
         self.antal = rader*kolumner
         self.skapaKryssrutor()
-        self.info = self.setInfo("Klient: X tur")
+        self.info = self.setInfo("Starta")
         self.inforad = Label(self.master, textvariable = self.info)
         self.pynta(self.inforad, bredd = (self.kolumner+2)*3)
         self.inforad.grid(row = self.rader, column = 0)
@@ -74,6 +72,9 @@ class KnappMatris(Frame):
         
     def okaOmgang(self):
         self.omgang += 1
+        nasta = self.hamtaNastaSpelare()
+        infostrang = nasta + " tur"
+        self.bytInfo(infostrang)
 
     def hamtaSpelare(self):
         if self.omgang%2 == 0:
@@ -153,8 +154,10 @@ class KnappMatris(Frame):
             self.setSpelplan(plan)
             mottaget = plan = None # Återställa variabler
             
+            
     def setSpelplan(self, plan):
         for index, tecken in enumerate (plan):
             if not self.knapplista[index].kryssad == True and not tecken == " ": 
                 self.knapplista[index].setTecken(tecken)
+                self.okaOmgang()
         self.matrisKontroll()
