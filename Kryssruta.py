@@ -22,20 +22,25 @@ class Kryssruta(Button):
 
     def kryssa(self):
         nastaSpelare = self.master.hamtaNastaSpelare()
-        if not self.kryssad:
-            if self.master.spelare == "X":
-                self.setTecken("X")
-                self.master.okaOmgang()
-            elif self.master.spelare == "O":
-                self.setTecken("O")
-                self.master.okaOmgang()
+        if self.master.minTur():
+            if not self.kryssad:
+                if self.master.spelare == "X":
+                    self.setTecken("X")
+                    self.master.okaOmgang()
+                elif self.master.spelare == "O":
+                    self.setTecken("O")
+                    self.master.okaOmgang()
+                else:
+                    self["text"] = "ERROR, okänd spelare"
+                    return
+                self.master.matrisKontroll()
+                self.master.skickaSpelplan()
             else:
-                self["text"] = "ERROR, okänd spelare"
+                print "Ruta upptagen"
+                return
         else:
-            print "Ruta upptagen"
-        self.master.matrisKontroll()
-        self.master.skickaSpelplan()
-
+            print "Vänta på din tur"
+            
     def setTecken(self, tecken):
         self.config(text = tecken)
         self.kryssad = True
@@ -62,6 +67,9 @@ class KnappMatris(Frame):
         self.inforad.grid(row = self.rader, column = 0)
         self.omgang = self.setStartnummer(startar)
 
+    def minTur(self):
+        return self.omgang%2 == 0
+    
     def setStartnummer(self, startar):
         if startar == True:
             return 0
@@ -100,7 +108,7 @@ class KnappMatris(Frame):
         else: 
             return "Din"
       
-    def pynta(self, komponent, bredd = 3, hojd = 1, bakgrundsfarg = "white", textfarg = "black", font = ("Ubuntu Mono", 20, "normal")):
+    def pynta(self, komponent, bredd = 3, hojd = 1, bakgrundsfarg = "white", textfarg = "black", font = ("Calibri", 20, "normal")):
         komponent["width"] = bredd
         komponent["height"] = hojd
         komponent["bg"] = bakgrundsfarg
