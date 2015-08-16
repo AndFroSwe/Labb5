@@ -4,14 +4,10 @@ import threading, socket
 
 class Klient(Kryssruta.KnappMatris):
     def __init__(self):
-        Kryssruta.KnappMatris.__init__(self)
+        Kryssruta.KnappMatris.__init__(self, False)
         self.connectToServer()
         self.startaTaEmot()
-
-    def startaTaEmot(self):
-        self.t = threading.Thread(target = self.taEmotSpelplan)
-        self.t.start()
-    
+                
     def connectToServer(self):
         self.s = socket.socket()
         host = socket.gethostname()

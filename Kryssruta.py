@@ -23,14 +23,14 @@ class Kryssruta(Button):
     def kryssa(self):
         nastaSpelare = self.master.hamtaNastaSpelare()
         if not self.kryssad:
-            if nastaSpelare == "X":
+            if self.master.spelare == "X":
                 self.setTecken("X")
                 self.master.okaOmgang()
-            elif nastaSpelare == "O":
+            elif self.master.spelare == "O":
                 self.setTecken("O")
                 self.master.okaOmgang()
             else:
-                self["text"] = "ERROR"
+                self["text"] = "ERROR, okänd spelare"
         else:
             print "Ruta upptagen"
         self.master.matrisKontroll()
@@ -48,22 +48,28 @@ class Kryssruta(Button):
                 
 class KnappMatris(Frame):
     """En lista med kryssrutor som ritas som en matris"""
-    def __init__(self, rader = 10, kolumner = 10):
+    def __init__(self, startar = True, rader = 10, kolumner = 10):
         self.master = Tk()
         Frame.__init__(self, self.master)
         self.grid()
         self.rader = rader
         self.kolumner = kolumner
         self.antal = rader*kolumner
+        self.info = self.setInfo(startar)
         self.skapaKryssrutor()
-        self.info = self.setInfo("Starta")
         self.inforad = Label(self.master, textvariable = self.info)
         self.pynta(self.inforad, bredd = (self.kolumner+2)*3)
         self.inforad.grid(row = self.rader, column = 0)
         self.omgang = 0
-    
-    def setInfo(self, text):
+        
+    def setInfo(self, startar):
         info = StringVar()
+        if startar == True:
+            text = "Du är spelare X. Din tur."
+            self.spelare = "X"
+        else:
+            text = "Du är spelare O. Motståndarens tur."
+            self.spelare = "O"
         info.set(text)
         return info
 
@@ -140,7 +146,11 @@ class KnappMatris(Frame):
     def stoppaSpel(self):
         for knapp in self.knapplista:
             knapp.taBortCommand()
-          
+
+    def startaTaEmot(self):
+        self.t = threading.Thread(target = self.taEmotSpelplan)
+        self.t.start()
+
     def skickaSpelplan(self):
         spelplan = self.hamtaKryssvektor()
         paket = pickle.dumps(spelplan)
@@ -153,7 +163,6 @@ class KnappMatris(Frame):
             print "Tagit emot" + str(plan)
             self.setSpelplan(plan)
             mottaget = plan = None # Återställa variabler
-            
             
     def setSpelplan(self, plan):
         for index, tecken in enumerate (plan):
