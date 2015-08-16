@@ -158,7 +158,7 @@ class KnappMatris(Frame):
             if self.knapplista[index]["text"] == " ":
                 self.knapplista[index]["text"] = tecken
                 self.knapplista[index].kryssad == True
-        self.matrisKontroll()
+        #self.matrisKontroll()
                 
     def setKryssmatris(self, vektor):
         for index, knapp in enumerate(self.knapplista):

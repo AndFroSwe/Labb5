@@ -24,12 +24,12 @@ class Kryssruta(Button):
         nastaSpelare = self.master.hamtaNastaSpelare()
         if not self.kryssad:
             if nastaSpelare == "X":
-                self["text"] = "X"
+                self.setTecken("X")
                 self.master.okaOmgang()
                 self.master.bytInfo("O tur")
                 self.kryssad = True
             elif nastaSpelare == "O":
-                self["text"] = "O"
+                self.setTecken("O")
                 self.master.okaOmgang()
                 self.master.bytInfo("X tur")
                 self.kryssad = True
@@ -39,7 +39,14 @@ class Kryssruta(Button):
             print "Ruta upptagen"
         self.master.matrisKontroll()
         self.master.skickaSpelplan()
-        
+
+    def setTecken(self, tecken):
+        self.config(text = tecken)
+
+    def hamtaTecken(self):
+        return self["text"]
+    
+    
     def taBortCommand(self):
         self.configure(command = lambda: None)
                 
@@ -53,15 +60,13 @@ class KnappMatris(Frame):
         self.kolumner = kolumner
         self.antal = rader*kolumner
         self.skapaKryssrutor()
-        self.info = self.setInfo("X tur")
+        self.info = self.setInfo("Klinet: X tur")
         self.inforad = Label(master, textvariable = self.info)
         self.pynta(self.inforad, bredd = (self.kolumner+2)*3)
         self.inforad.grid(row = self.rader, column = 0)
         self.omgang = 0
         self.connectToServer()
         self.startaTaEmot()
-        #self.t = threading.Thread(target = self.taEmotSpelplan)
-        #self.taEmotSpelplan()
 
     def startaTaEmot(self):
         self.t = threading.Thread(target = self.taEmotSpelplan)
@@ -113,8 +118,9 @@ class KnappMatris(Frame):
         index = 0
         for knapp in self.knapplista:
             if knapp.kryssad:
-                v[index] = knapp["text"]
+                v[index] = knapp.hamtaTecken()
             index += 1
+        print "Kontrollerar: " + str(v)
         return v
 
     def kryssmatris(self):
@@ -151,15 +157,15 @@ class KnappMatris(Frame):
         while True:
             mottaget = self.s.recv(1024)
             plan = pickle.loads(mottaget)
-            print plan
+            print "Tagit emot" + str(plan)
             self.setSpelplan(plan)
             mottaget = plan = None # Återställa variabler
             
     def setSpelplan(self, plan):
         for index, tecken in enumerate (plan):
-            if self.knapplista[index]["text"] == " ":
-                self.knapplista[index]["text"] = tecken
+            if not self.knapplista[index].kryssad == True: 
                 self.knapplista[index].kryssad == True
+                self.knapplista[index].setTecken(tecken)
         self.matrisKontroll()
             
     def connectToServer(self):
