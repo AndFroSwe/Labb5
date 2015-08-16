@@ -1,10 +1,11 @@
-# -*- coding: utf-8 -*-    # BehÃ¶vs i python 2 fÃ¶r Ã¥Ã¤Ã¶
+# -*- coding: utf-8 -*- 
 # Labb 5 i tilpro
 # Rita upp ett grÃ¤nssnitt
 
+#!/usr/bin/python          
+
+import socket, pickle, matriskoll, threading
 from Tkinter import *
-import matriskoll
-import time
 
 class Kryssruta(Button):
     """ Knapp som kryssas i/ur nÃ¤r man trycker pÃ¥ den """
@@ -23,12 +24,12 @@ class Kryssruta(Button):
         nastaSpelare = self.master.hamtaNastaSpelare()
         if not self.kryssad:
             if nastaSpelare == "X":
-                self["text"] = "X"
+                self.setTecken("X")
                 self.master.okaOmgang()
                 self.master.bytInfo("O tur")
                 self.kryssad = True
             elif nastaSpelare == "O":
-                self["text"] = "O"
+                self.setTecken("O")
                 self.master.okaOmgang()
                 self.master.bytInfo("X tur")
                 self.kryssad = True
@@ -37,26 +38,33 @@ class Kryssruta(Button):
         else:
             print "Ruta upptagen"
         self.master.matrisKontroll()
+        self.master.skickaSpelplan()
 
+    def setTecken(self, tecken):
+        self.config(text = tecken)
+
+    def hamtaTecken(self):
+        return self["text"]
+        
     def taBortCommand(self):
         self.configure(command = lambda: None)
                 
 class KnappMatris(Frame):
     """En lista med kryssrutor som ritas som en matris"""
-    def __init__(self, master = None, rader = 5, kolumner = 5):
-        Frame.__init__(self, master)
-        self.master = master
+    def __init__(self, rader = 10, kolumner = 10):
+        self.master = Tk()
+        Frame.__init__(self, self.master)
         self.grid()
         self.rader = rader
         self.kolumner = kolumner
         self.antal = rader*kolumner
         self.skapaKryssrutor()
-        self.info = self.setInfo("X tur")
-        self.inforad = Label(master, textvariable = self.info)
+        self.info = self.setInfo("Klient: X tur")
+        self.inforad = Label(self.master, textvariable = self.info)
         self.pynta(self.inforad, bredd = (self.kolumner+2)*3)
         self.inforad.grid(row = self.rader, column = 0)
         self.omgang = 0
-
+    
     def setInfo(self, text):
         info = StringVar()
         info.set(text)
@@ -103,8 +111,9 @@ class KnappMatris(Frame):
         index = 0
         for knapp in self.knapplista:
             if knapp.kryssad:
-                v[index] = knapp["text"]
+                v[index] = knapp.hamtaTecken()
             index += 1
+        print "Kontrollerar: " + str(v)
         return v
 
     def kryssmatris(self):
@@ -119,9 +128,9 @@ class KnappMatris(Frame):
         return matris
 
     def matrisKontroll(self):
+        print "Kollar om vinst"
         matris = self.kryssmatris()
         resultat = matriskoll.kollaMatris(matris)
-        #matriskoll.skrivaMatris(matris)
         if resultat == True:
             spelare = self.hamtaSpelare()
             vinnarString = spelare + " vinner!"
@@ -131,18 +140,23 @@ class KnappMatris(Frame):
     def stoppaSpel(self):
         for knapp in self.knapplista:
             knapp.taBortCommand()
+          
+    def skickaSpelplan(self):
+        spelplan = self.hamtaKryssvektor()
+        paket = pickle.dumps(spelplan)
+        self.s.send(paket)
 
-    def setKryssmatris(self, vektor):
-        for index, knapp in enumerate(self.knapplista):
-            knapp["text"] = vektor[index]
-        
+    def taEmotSpelplan(self):
+        while True:
+            mottaget = self.s.recv(1024)
+            plan = pickle.loads(mottaget)
+            print "Tagit emot" + str(plan)
+            self.setSpelplan(plan)
+            mottaget = plan = None # Återställa variabler
             
-def main():
-    antal_rader = input("Hur mÃ¥nga rader vill du ha? ")
-    antal_kolumner = input("Hur mÃ¥nga kolumner vill du ha? ")
-    rot = Tk()
-    matris = KnappMatris(rot, rader = antal_rader, kolumner = antal_kolumner)
-    matris.mainloop()
-
-main()
-
+    def setSpelplan(self, plan):
+        for index, tecken in enumerate (plan):
+            if not self.knapplista[index].kryssad == True: 
+                self.knapplista[index].kryssad == True
+                self.knapplista[index].setTecken(tecken)
+        self.matrisKontroll()
