@@ -60,7 +60,13 @@ class KnappMatris(Frame):
         self.inforad = Label(self.master, textvariable = self.info)
         self.pynta(self.inforad, bredd = (self.kolumner+2)*3)
         self.inforad.grid(row = self.rader, column = 0)
-        self.omgang = 0
+        self.omgang = self.setStartnummer(startar)
+
+    def setStartnummer(self, startar):
+        if startar == True:
+            return 0
+        else:
+            return 1
         
     def setInfo(self, startar):
         info = StringVar()
@@ -83,16 +89,16 @@ class KnappMatris(Frame):
         self.bytInfo(infostrang)
 
     def hamtaSpelare(self):
-        if self.omgang%2 == 0:
-            return "O"
+        if self.omgang%2 != 0:
+            return "Din"
         else: 
-            return "X"
+            return "Motståndarens"
         
     def hamtaNastaSpelare(self):
-        if self.omgang%2 == 0:
-            return "X"
+        if self.omgang%2 != 0:
+            return "Motståndarens"
         else: 
-            return "O"
+            return "Din"
       
     def pynta(self, komponent, bredd = 3, hojd = 1, bakgrundsfarg = "white", textfarg = "black", font = ("Ubuntu Mono", 20, "normal")):
         komponent["width"] = bredd
