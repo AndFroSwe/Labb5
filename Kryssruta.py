@@ -8,7 +8,7 @@ import socket, pickle, matriskoll, threading, time
 from Tkinter import *
 
 class Kryssruta(Button):
-    """ Knapp som kryssas i/ur nÃ¤r man trycker pÃ¥ den """
+    """ Knapp som kryssas i/ur när man trycker på den """
 
     def __init__(self, master = None, nr = 0, rad = 7, kolumn = 7):
         Button.__init__(self, master)
@@ -47,10 +47,10 @@ class Kryssruta(Button):
 
     def hamtaTecken(self):
         return self["text"]
-        
-    def taBortCommand(self):
-        self.configure(command = lambda: None)
-                
+
+    def stangFonster(self):
+        self.configure(command = lambda: self.master.master.destroy())
+    
 class KnappMatris(Frame):
     """En lista med kryssrutor som ritas som en matris"""
     def __init__(self, startar = True, rader = 10, kolumner = 10):
@@ -66,16 +66,10 @@ class KnappMatris(Frame):
         self.pynta(self.inforad, bredd = (self.kolumner+2)*3)
         self.inforad.grid(row = self.rader, column = 0)
         self.omgang = self.setStartnummer(startar)
+        self.end = False
+ 
+# Skapa spelplan 
 
-    def minTur(self):
-        return self.omgang%2 == 0
-    
-    def setStartnummer(self, startar):
-        if startar == True:
-            return 0
-        else:
-            return 1
-        
     def setInfo(self, startar):
         info = StringVar()
         if startar == True:
@@ -86,41 +80,7 @@ class KnappMatris(Frame):
             self.spelare = "O"
         info.set(text)
         return info
-
-    def bytInfo(self, text):
-        self.info.set(text)
-        
-    def okaOmgang(self):
-        self.omgang += 1
-        nasta = self.hamtaNastaSpelare()
-        infostrang = nasta + " tur"
-        self.bytInfo(infostrang)
-
-    def hamtaSpelare(self):
-        if self.omgang%2 != 0:
-            return "Din"
-        else: 
-            return "Motståndarens"
     
-    def hamtaSlutSpelare(self):
-        if self.omgang%2 != 0:
-            return "Du"
-        else: 
-            return "Motståndaren"
-        
-    def hamtaNastaSpelare(self):
-        if self.omgang%2 != 0:
-            return "Motståndarens"
-        else: 
-            return "Din"
-      
-    def pynta(self, komponent, bredd = 3, hojd = 1, bakgrundsfarg = "white", textfarg = "black", font = ("Calibri", 20, "normal")):
-        komponent["width"] = bredd
-        komponent["height"] = hojd
-        komponent["bg"] = bakgrundsfarg
-        komponent["fg"] = textfarg
-        komponent["font"] = font
-
     def skapaKryssrutor(self):
         self.knapplista = []
         for nr in range(self.antal):
@@ -131,19 +91,76 @@ class KnappMatris(Frame):
             ny.grid(row = ny.rad, column = ny.kolumn)
             self.knapplista.append(ny)
 
-    def hamtaKryssvektor(self):
-        """ Returnerar en lista med spelbanan """
-        v = [" "]*self.antal
-        index = 0
-        for knapp in self.knapplista:
-            if knapp.kryssad:
-                v[index] = knapp.hamtaTecken()
-            index += 1
-        #print "Kontrollerar: " + str(v)
-        return v
+    def pynta(self, komponent, bredd = 3, hojd = 1, bakgrundsfarg = "white", textfarg = "black", font = ("Calibri", 20, "normal")):
+        komponent["width"] = bredd
+        komponent["height"] = hojd
+        komponent["bg"] = bakgrundsfarg
+        komponent["fg"] = textfarg
+        komponent["font"] = font
+
+    def setStartnummer(self, startar):
+        if startar == True:
+            return 0
+        else:
+            return 1
+# Hantera turer
+    def okaOmgang(self):
+        self.omgang += 1
+        nasta = self.hamtaNastaSpelare()
+        infostrang = nasta + " tur"
+        self.bytInfo(infostrang)
+            
+    def hamtaNastaSpelare(self):
+        if self.omgang%2 != 0:
+            return "Motståndarens"
+        else: 
+            return "Din"
+
+    def minTur(self):
+        return self.omgang%2 == 0
+
+    def bytInfo(self, text):
+        self.info.set(text)
+        
+    def hamtaSpelare(self):
+        if self.omgang%2 != 0:
+            return "Din"
+        else: 
+            return "Motståndarens"
+
+ # Skicka och ta emot       
+    def skickaSpelplan(self):
+        spelplan = self.hamtaKryssvektor()
+        paket = pickle.dumps(spelplan)
+        self.s.send(paket)
+    
+    def taEmotSpelplan(self):
+        while True:
+            if self.end == True: break
+            mottaget = self.s.recv(1024)
+            plan = pickle.loads(mottaget)
+            self.setSpelplan(plan)
+            mottaget = plan = None # Återställa variabler
+ 
+    def setSpelplan(self, plan):
+        for index, tecken in enumerate (plan):
+            if not self.knapplista[index].kryssad == True and not tecken == " ": 
+                self.knapplista[index].setTecken(tecken)
+                self.okaOmgang()
+        self.matrisKontroll()
+
+# Kontrollera om vinst 
+    def matrisKontroll(self):
+        print "Kollar om vinst"
+        matris = self.kryssmatris()
+        resultat = matriskoll.kollaMatris(matris)
+        if resultat == True:
+            spelare = self.hamtaSlutSpelare()
+            vinnarString = spelare + " vinner! Tryck för att avsluta."
+            self.bytInfo(vinnarString)
+            self.stoppaSpel()
 
     def kryssmatris(self):
-        """ Returnerar en matris med spelbanan """
         vektor = self.hamtaKryssvektor()
         matris = []
         for i in range(self.rader):
@@ -153,40 +170,26 @@ class KnappMatris(Frame):
             matris.append(rad_temp)
         return matris
 
-    def matrisKontroll(self):
-        print "Kollar om vinst"
-        matris = self.kryssmatris()
-        resultat = matriskoll.kollaMatris(matris)
-        if resultat == True:
-            spelare = self.hamtaSlutSpelare()
-            vinnarString = spelare + " vinner!"
-            self.bytInfo(vinnarString)
-            self.stoppaSpel()
-
-    def stoppaSpel(self):
+    def hamtaKryssvektor(self):
+        """ Returnerar en lista med spelbanan """
+        v = [" "]*self.antal
+        index = 0
         for knapp in self.knapplista:
-            knapp.taBortCommand()
-        
-    def startaTaEmot(self):
-        self.t = threading.Thread(target = self.taEmotSpelplan)
-        self.t.start()
+            if knapp.kryssad:
+                v[index] = knapp.hamtaTecken()
+            index += 1
+        return v
 
-    def skickaSpelplan(self):
-        spelplan = self.hamtaKryssvektor()
-        paket = pickle.dumps(spelplan)
-        self.s.send(paket)
+# Avsluta
+    def stoppaSpel(self):
+        self.end = True
+        for knapp in self.knapplista:
+            knapp.stangFonster()
 
-    def taEmotSpelplan(self):
-        while True:
-            mottaget = self.s.recv(1024)
-            plan = pickle.loads(mottaget)
-            print "Tagit emot" + str(plan)
-            self.setSpelplan(plan)
-            mottaget = plan = None # Återställa variabler
-            
-    def setSpelplan(self, plan):
-        for index, tecken in enumerate (plan):
-            if not self.knapplista[index].kryssad == True and not tecken == " ": 
-                self.knapplista[index].setTecken(tecken)
-                self.okaOmgang()
-        self.matrisKontroll()
+    def hamtaSlutSpelare(self):
+        if self.omgang%2 != 0:
+            return "Du"
+        else: 
+            return "Motståndaren" 
+
+   
